@@ -1,0 +1,43 @@
+name: Generate Jasoseol RSS
+
+on:
+  schedule:
+    # 매일 자정, 아침 9시, 오후 6시 (UTC 기준 15, 0, 9시) 자동 실행
+    - cron: '0 0,9,15 * * *'
+  workflow_dispatch: # Actions 탭에서 수동으로 버튼을 눌러 실행할 수 있게 함
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 저장소 가져오기
+      uses: actions/checkout@v3
+
+    - name: 파이썬 환경 설정
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    # Selenium 구동을 위한 크롬 브라우저 설치
+    - name: 브라우저 환경 구성 (Install Chrome)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+
+    - name: 필요 패키지 설치
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 파이썬 웹 크롤링 스크립트 실행
+      run: python main.py
+
+    - name: 결과물 커밋 및 푸시
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add rss.xml
+        
+        # 파일에 변경점이 있을 경우에만 커밋
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update Jasoseol RSS feed" && git push)
