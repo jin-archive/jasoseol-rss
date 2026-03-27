@@ -2,8 +2,7 @@ name: Generate Jasoseol RSS
 
 on:
   schedule:
-    # 매일 자정, 아침 9시, 오후 6시 (UTC 기준 15, 0, 9시) 자동 실행
-    - cron: '0 0,9,15 * * *'
+    - cron: '0 * * * *' # 매시간 0분에 실행
   workflow_dispatch: # Actions 탭에서 수동으로 버튼을 눌러 실행할 수 있게 함
 
 jobs:
